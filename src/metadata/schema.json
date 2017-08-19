@@ -1,0 +1,725 @@
+{
+  "package": "GoogleSheets",
+  "tagline": "GoogleSheets API",
+  "description": "Read, write, and format data in Sheets. Programmatically create and update pivot tables, data validation, charts and more.",
+  "image": "https://logo.clearbit.com/docs.google.com",
+  "repo": "https://github.com/RapidSoftwareSolutions/Marketplace-GoogleSheets-Package",
+  "keywords": [
+    "API",
+    "google",
+    "docks",
+    "sheets"
+  ],
+  "accounts": {
+    "domain": "https://docs.google.com/spreadsheets",
+    "credentials": [
+      "clientId",
+      "clientSecret",
+      "accessToken"
+    ]
+  },
+  "blocks": [
+    {
+      "name": "getAccessToken",
+      "description": "Exchange code for access token.",
+      "args": [
+        {
+          "name": "clientId",
+          "vendorName": "client_id",
+          "type": "credentials",
+          "info": "The client ID that you obtain from the API Console, as described in Obtain OAuth 2.0 credentials.",
+          "required": true
+        },
+        {
+          "name": "clientSecret",
+          "vendorName": "client_secret",
+          "type": "credentials",
+          "info": "The client secret that you obtain from the API Console, as described in Obtain OAuth 2.0 credentials.",
+          "required": true
+        },
+        {
+          "name": "code",
+          "type": "String",
+          "info": "The authorization code that is returned from the initial request.",
+          "required": true
+        },
+        {
+          "name": "redirectUri",
+          "vendorName": "redirect_uri",
+          "type": "String",
+          "info": "The URI that you specify in the API Console, as described in Set a redirect URI.",
+          "required": true
+        },
+        {
+          "name": "grantType",
+          "vendorName": "grant_type",
+          "type": "String",
+          "info": "This field must contain a value of authorization_code, as defined in the OAuth 2.0 specification.",
+          "required": true
+        }
+
+      ],
+      "url": "https://www.googleapis.com/oauth2/v4/token",
+      "request": {
+        "method": "post",
+        "paramsType": "form_params",
+        "bodyParams": ["code","client_id","client_secret","redirect_uri","grant_type"]
+      },
+      "callbacks": [{
+        "name": "error",
+        "info": "Error"
+      }, {
+        "name": "success",
+        "info": "Success"
+      }]
+    },
+    {
+      "name": "updateSpreadsheet",
+      "description": "Applies one or more updates to the spreadsheet.",
+      "args": [
+        {
+          "name": "accessToken",
+          "type": "credentials",
+          "info": "OAuth 2.0 token for the current user.",
+          "required": true
+        },
+        {
+          "name": "spreadsheetId",
+          "type": "String",
+          "info": "The spreadsheet to apply the updates to.",
+          "required": true
+        },
+        {
+          "name": "requests",
+          "type": "List",
+          "info": "A list of updates to apply to the spreadsheet. Requests will be applied in the order they are specified. If any request is not valid, no requests will be applied.",
+          "required": true,
+          "structure": {
+            "name": "updateObject",
+            "type": "JSON",
+            "info": "Single update object."
+          }
+        },
+        {
+          "name": "includeSpreadsheetInResponse",
+          "type": "Select",
+          "options": ["true","false"],
+          "info": "Determines if the update response should include the spreadsheet resource.",
+          "required": false
+        },
+        {
+          "name": "responseIncludeGridData",
+          "type": "Select",
+          "options": ["true","false"],
+          "info": "True if grid data should be returned. Meaningful only if if includeSpreadsheetResponse is 'true'. This parameter is ignored if a field mask was set in the request.",
+          "required": false
+        },
+        {
+          "name": "responseRanges",
+          "type": "List",
+          "info": "Limits the ranges included in the response spreadsheet. Meaningful only if includeSpreadsheetResponse is 'true'.",
+          "required": false,
+          "structure": {
+            "name": "range",
+            "type": "String",
+            "info": "Single range."
+          }
+        }
+      ],
+      "url": "https://sheets.googleapis.com/v4/spreadsheets/{$data['spreadsheetId']}:batchUpdate",
+      "request": {
+        "method": "post",
+        "paramsType": "json",
+        "bodyParams": ["requests","includeSpreadsheetInResponse","responseRanges","responseIncludeGridData"],
+        "headers": {
+          "Authorization": "Bearer {$data['accessToken']}"
+        }
+      },
+      "callbacks": [{
+        "name": "error",
+        "info": "Error"
+      }, {
+        "name": "success",
+        "info": "Success"
+      }]
+    },
+    {
+      "name": "createSpreadsheet",
+      "description": "Creates a spreadsheet, returning the newly created spreadsheet.",
+      "args": [
+        {
+          "name": "accessToken",
+          "type": "credentials",
+          "info": "OAuth 2.0 token for the current user.",
+          "required": true
+        },
+        {
+          "name": "properties",
+          "type": "JSON",
+          "info": "Overall properties of a spreadsheet.",
+          "required": false
+        },
+        {
+          "name": "sheets",
+          "type": "List",
+          "info": "The sheets that are part of a spreadsheet.",
+          "required": false,
+          "structure": {
+            "name": "sheet",
+            "type": "JSON",
+            "info": "Single sheet."
+          }
+        },
+        {
+          "name": "namedRanges",
+          "type": "List",
+          "info": "The named ranges defined in a spreadsheet.",
+          "required": false,
+          "structure": {
+            "name": "nameRange",
+            "type": "JSON",
+            "info": "Single name range."
+          }
+        }
+      ],
+      "url": "https://sheets.googleapis.com/v4/spreadsheets",
+      "request": {
+        "method": "post",
+        "paramsType": "json",
+        "bodyParams": ["properties","sheets","namedRanges"],
+        "headers": {
+          "Authorization": "Bearer {$data['accessToken']}"
+        }
+      },
+      "callbacks": [{
+        "name": "error",
+        "info": "Error"
+      }, {
+        "name": "success",
+        "info": "Success"
+      }]
+    },
+    {
+      "name": "getSingleSpreadsheet",
+      "description": "Returns the spreadsheet at the given ID. The caller must specify the spreadsheet ID.",
+      "args": [
+        {
+          "name": "accessToken",
+          "type": "credentials",
+          "info": "OAuth 2.0 token for the current user.",
+          "required": true
+        },
+        {
+          "name": "spreadsheetId",
+          "type": "String",
+          "info": "The spreadsheet to request.",
+          "required": true
+        },
+        {
+          "name": "ranges",
+          "type": "String",
+          "info": "The ranges to retrieve from the spreadsheet.",
+          "required": false
+        },
+        {
+          "name": "includeGridData",
+          "type": "Select",
+          "options": ["true", "false"],
+          "info": "True if grid data should be returned. This parameter is ignored if a field mask was set in the request.",
+          "required": false
+        }
+      ],
+      "url": "https://sheets.googleapis.com/v4/spreadsheets/{$data['spreadsheetId']}",
+      "request": {
+        "method": "get",
+        "paramsType": "query",
+        "bodyParams": ["ranges","includeGridData"],
+        "headers": {
+          "Authorization": "Bearer {$data['accessToken']}"
+        }
+      },
+      "callbacks": [{
+        "name": "error",
+        "info": "Error"
+      }, {
+        "name": "success",
+        "info": "Success"
+      }]
+    },
+    {
+      "name": "copySheets",
+      "description": "Copies a single sheet from a spreadsheet to another spreadsheet. Returns the properties of the newly created sheet.",
+      "args": [
+        {
+          "name": "accessToken",
+          "type": "credentials",
+          "info": "OAuth 2.0 token for the current user.",
+          "required": true
+        },
+        {
+          "name": "spreadsheetId",
+          "type": "String",
+          "info": "The ID of the spreadsheet containing the sheet to copy.",
+          "required": true
+        },
+        {
+          "name": "sheetId",
+          "type": "String",
+          "info": "The ID of the sheet to copy.",
+          "required": true
+        },
+        {
+          "name": "destinationSpreadsheetId",
+          "type": "String",
+          "info": "The ID of the spreadsheet to copy the sheet to.",
+          "required": true
+        }
+      ],
+      "url": "https://sheets.googleapis.com/v4/spreadsheets/{$data['spreadsheetId']}/sheets/{$data['sheetId']}:copyTo",
+      "request": {
+        "method": "post",
+        "paramsType": "json",
+        "bodyParams": ["destinationSpreadsheetId"],
+        "headers": {
+          "Authorization": "Bearer {$data['accessToken']}"
+        }
+      },
+      "callbacks": [{
+        "name": "error",
+        "info": "Error"
+      }, {
+        "name": "success",
+        "info": "Success"
+      }]
+    },
+    {
+      "name": "appendSheetValues",
+      "description": "Appends values to a spreadsheet. The input range is used to search for existing data and find a `table` within that range. Values will be appended to the next row of the table, starting with the first column of the table.",
+      "args": [
+        {
+          "name": "accessToken",
+          "type": "credentials",
+          "info": "OAuth 2.0 token for the current user.",
+          "required": true
+        },
+        {
+          "name": "spreadsheetId",
+          "type": "String",
+          "info": "The ID of the spreadsheet to update.",
+          "required": true
+        },
+        {
+          "name": "range",
+          "type": "String",
+          "info": "The A1 notation of a range to search for a logical table of data. Values will be appended after the last row of the table.",
+          "required": true
+        },
+        {
+          "name": "valueInputOption",
+          "type": "Select",
+          "options": ["INPUT_VALUE_OPTION_UNSPECIFIED","RAW","USER_ENTERED"],
+          "info": "How the input data should be interpreted. Must be: INPUT_VALUE_OPTION_UNSPECIFIED,RAW,USER_ENTERED",
+          "required": true
+        },
+        {
+          "name": "insertDataOption",
+          "type": "Select",
+          "options": ["OVERWRITE","INSERT_ROWS"],
+          "info": "How the input data should be inserted. Must be: OVERWRITE,INSERT_ROWS",
+          "required": true
+        },
+        {
+          "name": "includeValuesInResponse",
+          "type": "Select",
+          "options": ["true","false"],
+          "info": "Determines if the update response should include the values of the cells that were appended. By default, responses do not include the updated values.",
+          "required": true
+        },
+        {
+          "name": "responseValueRenderOption",
+          "type": "Select",
+          "options": ["FORMATTED_VALUE","UNFORMATTED_VALUE","FORMULA"],
+          "info": "Determines how values in the response should be rendered. Must be: FORMATTED_VALUE,UNFORMATTED_VALUE,FORMULA",
+          "required": true
+        },
+        {
+          "name": "responseDateTimeRenderOption",
+          "type": "Select",
+          "options": ["SERIAL_NUMBER","FORMATTED_STRING"],
+          "info": "Determines how dates, times, and durations in the response should be rendered. Must be: SERIAL_NUMBER,FORMATTED_STRING",
+          "required": true
+        },
+        {
+          "name": "valueRange",
+          "type": "JSON",
+          "info": "ValueRange structure.",
+          "required": true
+        }
+      ],
+      "url": "https://sheets.googleapis.com/v4/spreadsheets/{$data['spreadsheetId']}/values/{$data['range']}:append",
+      "request": {
+        "method": "post",
+        "paramsType": "query",
+        "bodyParams": ["valueInputOption","insertDataOption","includeValuesInResponse","responseValueRenderOption","responseDateTimeRenderOption"],
+        "headers": {
+          "Authorization": "Bearer {$data['accessToken']}"
+        }
+      },
+      "callbacks": [{
+        "name": "error",
+        "info": "Error"
+      }, {
+        "name": "success",
+        "info": "Success"
+      }]
+    },
+    {
+      "name": "batchClear",
+      "description": "Clears one or more ranges of values from a spreadsheet.   ",
+      "args": [
+        {
+          "name": "accessToken",
+          "type": "credentials",
+          "info": "OAuth 2.0 token for the current user.",
+          "required": true
+        },
+        {
+          "name": "spreadsheetId",
+          "type": "String",
+          "info": "The ID of the spreadsheet to update.",
+          "required": true
+        },
+        {
+          "name": "ranges",
+          "type": "List",
+          "info": "The ranges to clear, in A1 notation.",
+          "required": true,
+          "options": {
+            "name": "range",
+            "type": "String",
+            "info": "Single range."
+          }
+        }
+      ],
+      "url": "https://sheets.googleapis.com/v4/spreadsheets/{$data['spreadsheetId']}/values:batchClear",
+      "request": {
+        "method": "post",
+        "paramsType": "json",
+        "bodyParams": ["ranges"],
+        "headers": {
+          "Authorization": "Bearer {$data['accessToken']}"
+        }
+      },
+      "callbacks": [{
+        "name": "error",
+        "info": "Error"
+      }, {
+        "name": "success",
+        "info": "Success"
+      }]
+    },
+    {
+      "name": "getBatchValues",
+      "description": "Returns one or more ranges of values from a spreadsheet. The caller must specify the spreadsheet ID and one or more ranges.",
+      "args": [
+        {
+          "name": "accessToken",
+          "type": "credentials",
+          "info": "OAuth 2.0 token for the current user.",
+          "required": true
+        },
+        {
+          "name": "spreadsheetId",
+          "type": "String",
+          "info": "The ID of the spreadsheet to retrieve data from.",
+          "required": true
+        },
+        {
+          "name": "ranges",
+          "type": "String",
+          "info": "The A1 notation of the values to retrieve.",
+          "required": true
+        },
+        {
+          "name": "majorDimension",
+          "type": "Select",
+          "options": ["DIMENSION_UNSPECIFIED","ROWS","COLUMNS"],
+          "info": "The major dimension that results should use. Must be: DIMENSION_UNSPECIFIED, ROWS, COLUMNS",
+          "required": true
+        },
+        {
+          "name": "valueRenderOption",
+          "type": "Select",
+          "options": ["FORMATTED_VALUE","UNFORMATTED_VALUE","FORMULA"],
+          "info": "How values should be represented in the output. Must be: FORMATTED_VALUE, UNFORMATTED_VALUE, FORMULA",
+          "required": true
+        },
+        {
+          "name": "dateTimeRenderOption",
+          "type": "Select",
+          "options": ["SERIAL_NUMBER","FORMATTED_STRING"],
+          "info": "How dates, times, and durations should be represented in the output. Must be: SERIAL_NUMBER, FORMATTED_STRING",
+          "required": true
+        }
+      ],
+      "url": "https://sheets.googleapis.com/v4/spreadsheets/{$data['spreadsheetId']}/values:batchGet",
+      "request": {
+        "method": "post",
+        "paramsType": "query",
+        "bodyParams": ["ranges","majorDimension","valueRenderOption","dateTimeRenderOption"],
+        "headers": {
+          "Authorization": "Bearer {$data['accessToken']}"
+        }
+      },
+      "callbacks": [{
+        "name": "error",
+        "info": "Error"
+      }, {
+        "name": "success",
+        "info": "Success"
+      }]
+    },
+    {
+      "name": "batchUpdate",
+      "description": "Sets values in one or more ranges of a spreadsheet.",
+      "args": [
+        {
+          "name": "accessToken",
+          "type": "credentials",
+          "info": "OAuth 2.0 token for the current user.",
+          "required": true
+        },
+        {
+          "name": "spreadsheetId",
+          "type": "String",
+          "info": "The ID of the spreadsheet to update.",
+          "required": true
+        },
+        {
+          "name": "valueInputOption",
+          "type": "Select",
+          "options": ["INPUT_VALUE_OPTION_UNSPECIFIED","RAW","USER_ENTERED"],
+          "info": "How the input data should be interpreted. Must be: INPUT_VALUE_OPTION_UNSPECIFIED, RAW, USER_ENTERED",
+          "required": true
+        },
+        {
+          "name": "data",
+          "type": "JSON",
+          "info": "The new values to apply to the spreadsheet.",
+          "required": true
+        },
+        {
+          "name": "includeValuesInResponse",
+          "type": "Select",
+          "options": ["true","false"],
+          "info": "Determines if the update response should include the values of the cells that were updated. true or false",
+          "required": true
+        },
+        {
+          "name": "responseValueRenderOption",
+          "type": "Select",
+          "options": ["FORMATTED_VALUE","UNFORMATTED_VALUE","FORMULA"],
+          "info": "Determines how values in the response should be rendered. Must be: FORMATTED_VALUE, UNFORMATTED_VALUE, FORMULA",
+          "required": true
+        },
+        {
+          "name": "responseDateTimeRenderOption",
+          "type": "Select",
+          "options": ["SERIAL_NUMBER","FORMATTED_STRING"],
+          "info": "Determines how dates, times, and durations in the response should be rendered. Must be: SERIAL_NUMBER, FORMATTED_STRING",
+          "required": true
+        }
+      ],
+      "url": "https://sheets.googleapis.com/v4/spreadsheets/{$data['spreadsheetId']}/values:batchUpdate",
+      "request": {
+        "method": "post",
+        "paramsType": "json",
+        "bodyParams": ["valueInputOption","data","includeValuesInResponse","responseValueRenderOption","responseDateTimeRenderOption"],
+        "headers": {
+          "Authorization": "Bearer {$data['accessToken']}"
+        }
+      },
+      "callbacks": [{
+        "name": "error",
+        "info": "Error"
+      }, {
+        "name": "success",
+        "info": "Success"
+      }]
+    },
+    {
+      "name": "clearValues",
+      "description": "Clears values from a spreadsheet. The caller must specify the spreadsheet ID and range. Only values are cleared -- all other properties of the cell (such as formatting, data validation, etc..) are kept.",
+      "args": [
+        {
+          "name": "accessToken",
+          "type": "credentials",
+          "info": "OAuth 2.0 token for the current user.",
+          "required": true
+        },
+        {
+          "name": "spreadsheetId",
+          "type": "String",
+          "info": "The ID of the spreadsheet to update.",
+          "required": true
+        },
+        {
+          "name": "range",
+          "type": "String",
+          "info": "The A1 notation of the values to clear.",
+          "required": true
+        }
+      ],
+      "url": "https://sheets.googleapis.com/v4/spreadsheets/{$data['spreadsheetId']}/values/{$data['range']}:clear",
+      "request": {
+        "method": "post",
+        "paramsType": "query",
+        "headers": {
+          "Authorization": "Bearer {$data['accessToken']}"
+        }
+      },
+      "callbacks": [{
+        "name": "error",
+        "info": "Error"
+      }, {
+        "name": "success",
+        "info": "Success"
+      }]
+    },
+    {
+      "name": "getRangeValues",
+      "description": "Returns a range of values from a spreadsheet. The caller must specify the spreadsheet ID and a range.",
+      "args": [
+        {
+          "name": "accessToken",
+          "type": "credentials",
+          "info": "OAuth 2.0 token for the current user.",
+          "required": true
+        },
+        {
+          "name": "spreadsheetId",
+          "type": "String",
+          "info": "The ID of the spreadsheet to retrieve data from.",
+          "required": true
+        },
+        {
+          "name": "range",
+          "type": "String",
+          "info": "The A1 notation of the values to retrieve.",
+          "required": true
+        },
+        {
+          "name": "majorDimension",
+          "type": "Select",
+          "options": ["DIMENSION_UNSPECIFIED","ROWS","COLUMNS"],
+          "info": "The A1 notation of the values to retrieve. Must be: DIMENSION_UNSPECIFIED, ROWS, COLUMNS",
+          "required": false
+        },
+        {
+          "name": "valueRenderOption",
+          "type": "Select",
+          "options": ["FORMATTED_VALUE","UNFORMATTED_VALUE","FORMULA"],
+          "info": "How values should be represented in the output. Must be: FORMATTED_VALUE, UNFORMATTED_VALUE, FORMULA",
+          "required": false
+        },
+        {
+          "name": "dateTimeRenderOption",
+          "type": "Select",
+          "options": ["SERIAL_NUMBER","FORMATTED_STRING"],
+          "info": "How dates, times, and durations should be represented in the output. Must be: SERIAL_NUMBER, FORMATTED_STRING",
+          "required": false
+        }
+      ],
+      "url": "https://sheets.googleapis.com/v4/spreadsheets/{$data['spreadsheetId']}/values/{$data['range']}",
+      "request": {
+        "method": "get",
+        "paramsType": "query",
+        "bodyParams": ["majorDimension","valueRenderOption","dateTimeRenderOption"],
+        "headers": {
+          "Authorization": "Bearer {$data['accessToken']}"
+        }
+      },
+      "callbacks": [{
+        "name": "error",
+        "info": "Error"
+      }, {
+        "name": "success",
+        "info": "Success"
+      }]
+    },
+    {
+      "name": "updateRangeValues",
+      "description": "Sets values in a range of a spreadsheet.",
+      "args": [
+        {
+          "name": "accessToken",
+          "type": "credentials",
+          "info": "OAuth 2.0 token for the current user.",
+          "required": true
+        },
+        {
+          "name": "spreadsheetId",
+          "type": "String",
+          "info": "The ID of the spreadsheet to update.",
+          "required": true
+        },
+        {
+          "name": "range",
+          "type": "String",
+          "info": "The A1 notation of the values to update.",
+          "required": true
+        },
+        {
+          "name": "valueInputOption",
+          "type": "Select",
+          "options": ["INPUT_VALUE_OPTION_UNSPECIFIED","RAW","USER_ENTERED"],
+          "info": "How the input data should be interpreted. Must be: INPUT_VALUE_OPTION_UNSPECIFIED, RAW, USER_ENTERED",
+          "required": false
+        },
+        {
+          "name": "includeValuesInResponse",
+          "type": "Select",
+          "options": ["true","false"],
+          "info": "Determines if the update response should include the values of the cells that were updated.",
+          "required": false
+        },
+        {
+          "name": "responseValueRenderOption",
+          "type": "Select",
+          "options": ["FORMATTED_VALUE","UNFORMATTED_VALUE","FORMULA"],
+          "info": "Determines how values in the response should be rendered. Must be: FORMATTED_VALUE, UNFORMATTED_VALUE, FORMULA",
+          "required": false
+        },
+        {
+          "name": "responseDateTimeRenderOption",
+          "type": "Select",
+          "options": ["SERIAL_NUMBER","FORMATTED_STRING"],
+          "info": "Determines how dates, times, and durations in the response should be rendered. Must be: SERIAL_NUMBER, FORMATTED_STRING",
+          "required": false
+        },
+        {
+          "name": "value",
+          "type": "JSON",
+          "info": "Data within a range of the spreadsheet.",
+          "required": true
+        }
+      ],
+      "url": "https://sheets.googleapis.com/v4/spreadsheets/{$data['spreadsheetId']}/values/{$data['range']}",
+      "request": {
+        "method": "put",
+        "paramsType": "query",
+        "bodyParams": ["valueInputOption","includeValuesInResponse","responseValueRenderOption","responseDateTimeRenderOption"],
+        "headers": {
+          "Authorization": "Bearer {$data['accessToken']}"
+        }
+      },
+      "callbacks": [{
+        "name": "error",
+        "info": "Error"
+      }, {
+        "name": "success",
+        "info": "Success"
+      }]
+    }
+  ]
+}
