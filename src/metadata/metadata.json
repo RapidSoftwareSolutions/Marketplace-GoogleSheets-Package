@@ -382,7 +382,7 @@
                     "type": "List",
                     "info": "The ranges to clear, in A1 notation.",
                     "required": true,
-                    "options": {
+                    "structure": {
                         "name": "range",
                         "type": "String",
                         "info": "Single range."
